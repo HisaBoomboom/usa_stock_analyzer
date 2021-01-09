@@ -1,0 +1,7 @@
+ticker_symbols:
+  dir_path: .
+  file_name: symbols.csv
+
+stock_price:
+  dir_path: stock_price
+  file_name: "{}_stock_price.csv"
