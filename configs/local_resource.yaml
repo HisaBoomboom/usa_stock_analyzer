@@ -1,7 +1,7 @@
-nasdaq_symbols:
+ticker_symbols:
   dir_path: .
   file_name: symbols.csv
 
-nasdaq_stock_price:
+stock_price:
   dir_path: stock_price
   file_name: "{}_stock_price.csv"

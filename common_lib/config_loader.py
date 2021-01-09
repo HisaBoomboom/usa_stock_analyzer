@@ -20,16 +20,16 @@ class Config:
         return self.__local_resource_dir
 
 
-    def nasdaq_symbols_file_path(self):
-        config = self.__local_resource_config.get("nasdaq_symbols")
+    def ticker_symbols_file_path(self):
+        config = self.__local_resource_config.get("ticker_symbols")
         base = self.__local_resource_dir
         dir = config.get("dir_path")
         file_name = config.get("file_name")
         return str(Path(base, dir, file_name))
 
 
-    def nasdaq_stock_price_file_path(self, symbol):
-        config = self.__local_resource_config.get("nasdaq_stock_price")
+    def stock_price_file_path(self, symbol):
+        config = self.__local_resource_config.get("stock_price")
         base = self.__local_resource_dir
         dir = config.get("dir_path")
         file_name = config.get("file_name").format(symbol)

@@ -1,26 +1,21 @@
-from pathlib import Path
-
-import pandas_datareader.data as web
-from pandas_datareader.data import get_nasdaq_symbols
 import pandas as pd
+import pandas_datareader.data as web
 
 DATA_SOURCE_KEY = "yahoo"
 STOCK_DATA_KEY_LIST = ['High', 'Low', 'Open', 'Close', 'Adj Close', 'Volume']
 
 
-def fetch_nasdaq_symbols_data(config):
-    """
-    Download symbols data to local resource directory.
-    """
-    path = config.nasdaq_symbols_file_path()
+def download_stock_price_data(symbol, start, end, config):
+    df = web.DataReader(symbol, DATA_SOURCE_KEY, start=start, end=end)
 
-    with open(str(path), "w") as f:
-        df = get_nasdaq_symbols()
+    file_path = config.stock_price_file_path(symbol)
+    with open(file_path, "+w") as f:
         df.to_csv(f)
-        print("success to download data to {}".format(path))
+
+    return df
 
 
-def bulk_fetch_nasdaq_stock_data(symbols, start, end, config):
+def bulk_download_stock_price_data(symbols, start, end, config):
     """
     Get all stock data of given symbol list, and save data corresponding to each key as csv.
     symbols: list
@@ -33,6 +28,6 @@ def bulk_fetch_nasdaq_stock_data(symbols, start, end, config):
         # Extract data of key from MultiIndex DataFrame
         df = pd.DataFrame({new_key:all_df[key] for (new_key, key) in zip(STOCK_DATA_KEY_LIST, symbol_keys)})
 
-        file_path = config.nasdaq_stock_price_file_path(symbol)
+        file_path = config.stock_price_file_path(symbol)
         with open(file_path, "+w") as f:
             df.to_csv(f)

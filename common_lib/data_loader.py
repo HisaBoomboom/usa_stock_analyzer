@@ -1,6 +1,9 @@
 import pandas as pd
-from pathlib import Path
 
-def load_nasdaq_symbols(config):
-    path = config.nasdaq_symbols_file_path()
-    return pd.read_csv(path, sep=',')
+TICKER_SYMBOL_FILE_CODE_KEY = "現地コード"
+
+def load_ticker_symbols_as_list(config):
+    path = config.ticker_symbols_file_path()
+    df = pd.read_csv(path, sep=',')
+
+    return list(df[TICKER_SYMBOL_FILE_CODE_KEY])
