@@ -1,6 +1,6 @@
 ticker_symbols:
   dir_path: .
-  file_name: symbols.csv
+  file_name: symbols.txt
 
 stock_price:
   dir_path: stock_price

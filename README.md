@@ -6,15 +6,22 @@
 Place symbols.txt which contains ticker-symbol
 in each line under local resource directory.
 ```shell
-$pwd 
-/path/for/local/resource
-
-$ls
-symbols.txt
+$cat /path/for/local/resource/symbols.txt
+A
+AA
+AAL
+...
 ```
-
 Download stock data of ticker-symbols described in `symbols.txt` via pandas-datareader.
 ```shell
-export="LOCAL RESOURCE DIRECTORY"
+export="/path/for/local/resource"
 python data_crawler.py
+```
+
+
+## Refresh local data
+Download data from last updated date to now.
+```shell
+export="/path/for/local/resource"
+python data_fetcher.py
 ```

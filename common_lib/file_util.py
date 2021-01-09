@@ -1,6 +1,4 @@
 import os
-import re
-from pathlib import Path
 
 
 def is_target_symbol_stock_data_exists(symbol, config):
