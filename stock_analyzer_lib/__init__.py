@@ -1,0 +1,1 @@
+from stock_analyzer_lib import technical_analyze_tool
