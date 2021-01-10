@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 
-def plot_trade_hist(df, trading_hist):
+def plot_trade_hist(df, trading_hist, symbol):
+    plt.clf()
+
     prices = df['Price'].values
     sma25 = df['SMA25'].values
     sma75 = df['SMA75'].values
@@ -30,7 +32,8 @@ def plot_trade_hist(df, trading_hist):
         ax1.axvline(sell[0], ymin=0, ymax=1, color='r', linestyle='dotted')
         ax2.axvline(buy[0], ymin=0, ymax=1, color='b', linestyle='dotted')
         ax2.axvline(sell[0], ymin=0, ymax=1, color='r', linestyle='dotted')
-    plt.show()
+    # plt.show()
+    plt.savefig("output/{}.png".format(symbol))
 
 
 def get_golden_cross_points(prices, macd2):
