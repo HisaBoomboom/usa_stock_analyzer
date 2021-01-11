@@ -1,12 +1,7 @@
-import plotly.graph_objects as go
-
-import mplfinance as mpf
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-from common_lib import *
 import pandas as pd
+
 from analyzer_lib import *
+from common_lib import *
 
 
 def main():
@@ -31,7 +26,6 @@ def analyze(symbol, config):
     all_data.set_index('Date', inplace=True)
 
     prices_df = all_data['Close']
-    prices_df = prices_df['2020':]
 
     macd = technical_analyze_tool.calc_macd(prices_df)
     sig = technical_analyze_tool.calc_macd_signal(prices_df)
@@ -71,7 +65,6 @@ def analyze(symbol, config):
         win_count += 1 if benefit_ratio > 0 else 0
         lose_count += 1 if benefit_ratio < 0 else 0
 
-
     print("###### RESULT #######")
     print("SYMBOL = {}".format(symbol))
     print("TOTAL BENEFIT = {}".format(total_benefit_ratio))
@@ -80,8 +73,7 @@ def analyze(symbol, config):
     win_ratio = win_count/(win_count + lose_count) if not (win_count + lose_count)==0 else None
     print("Win Ratio = {}".format(win_ratio))
 
-    graph.plot_trade_hist(df, trading_hist, symbol)
-
+    graph.save_trade_hist(df, trading_hist, symbol)
     return ((total_benefit_ratio, win_ratio))
 
 
