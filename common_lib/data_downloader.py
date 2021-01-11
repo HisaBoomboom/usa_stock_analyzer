@@ -4,7 +4,6 @@ import pandas_datareader.data as web
 DATA_SOURCE_KEY = "yahoo"
 STOCK_DATA_KEY_LIST = ['High', 'Low', 'Open', 'Close', 'Adj Close', 'Volume']
 
-
 def download_stock_price_data(symbol, start, end, config):
     df = web.DataReader(symbol, DATA_SOURCE_KEY, start=start, end=end)
 
@@ -51,11 +50,12 @@ def bulk_download_and_fetch_price_data(symbols, start, end, config):
         df = pd.DataFrame({new_key: all_df[key] for (new_key, key) in zip(STOCK_DATA_KEY_LIST, symbol_keys)})
 
         file_path = config.stock_price_file_path(symbol)
-        existing_df = pd.read_csv(file_path)
+        edf = pd.read_csv(file_path, index_col=0, parse_dates=True)
 
-        new_df = pd.concat([existing_df, df])
-        new_df.drop_duplicates()
+        for i in range(len(df)):
+            if df.index[i] not in edf.index:
+                edf = edf.append(df[i:i+1])
 
         with open(file_path, 'w') as f:
-            new_df.to_csv(f)
+            edf.to_csv(f)
         print("---- success ----")
