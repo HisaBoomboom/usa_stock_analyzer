@@ -10,9 +10,8 @@ def main():
 
     result = []
     for symbol in symbols:
-        (benefit, ratio) = analyze(symbol, config)
-        result.append("{} {} {}".format(symbol, benefit, ratio))
-        break
+        benefit = simulate(symbol, config)
+        result.append("{} {}\n".format(symbol, benefit))
 
     print("#################")
     print("SUMMARY")
@@ -21,11 +20,13 @@ def main():
             f.write(i)
 
 
-def analyze(symbol, config):
+def simulate(symbol, config):
+    """
+    Walk through stock price data, mark buy/sell timings, and output result if you buy/sell stocks at those timings.
+    """
     all_data = data_loader.load_stock_data(symbol, config)
-    all_data.set_index('Date', inplace=True)
-
     prices_df = all_data['Close']
+    prices_df = prices_df['2019':]
 
     macd = technical_analyze_tool.calc_macd(prices_df)
     sig = technical_analyze_tool.calc_macd_signal(prices_df)
@@ -39,42 +40,40 @@ def analyze(symbol, config):
     })
     prices = df['Price'].values
 
-    trading_hist = []
+    trading_hist = []       # Each element should be [(i, buy-price), (i, sell-price)]
     buy = None
     for i in range(len(prices)):
         if prices[i] == None:
             continue
 
+        # Buy timing
         if buy == None and trade_analyzer.is_buy_timing(i, df):
             buy = (i, prices[i])
             continue
 
+        # Sell timing
         if buy != None and trade_analyzer.is_sell_timing(i, df):
             trading_hist.append([buy, (i, prices[i])])
             buy = None
 
     total_benefit_ratio = 1
-    win_count = 0
-    lose_count = 0
     for trade in trading_hist:
         buy_price = trade[0][1]
         sell_price = trade[1][1]
 
         benefit_ratio = (sell_price / buy_price)
         total_benefit_ratio *= benefit_ratio
-        win_count += 1 if benefit_ratio > 0 else 0
-        lose_count += 1 if benefit_ratio < 0 else 0
 
     print("###### RESULT #######")
     print("SYMBOL = {}".format(symbol))
     print("TOTAL BENEFIT = {}".format(total_benefit_ratio))
     print("TRADE COUNT = {}".format(len(trading_hist)))
 
-    win_ratio = win_count/(win_count + lose_count) if not (win_count + lose_count)==0 else None
-    print("Win Ratio = {}".format(win_ratio))
 
-    graph.save_trade_hist(df, trading_hist, symbol)
-    return ((total_benefit_ratio, win_ratio))
+    if total_benefit_ratio < 1:
+        graph.save_trade_hist(df, trading_hist, symbol)
+
+    return total_benefit_ratio
 
 
 if __name__ == "__main__":

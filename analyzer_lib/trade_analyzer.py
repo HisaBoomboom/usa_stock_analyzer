@@ -2,6 +2,10 @@ from . import technical_analyze_tool
 import numpy as np
 
 def is_buy_timing(i, df):
+    """
+    i: index of df
+    df: DataFrame type data contains all stock data with date index
+    """
     if i == 0:
         return False
 
@@ -45,6 +49,10 @@ def is_buy_timing(i, df):
 
 
 def is_sell_timing(i, df):
+    """
+    i: index of df
+    df: DataFrame type data contains all stock data with date index
+    """
     if i == 0:
         return False
 

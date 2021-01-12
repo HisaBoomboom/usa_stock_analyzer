@@ -9,4 +9,4 @@ def load_ticker_symbols_as_list(config):
 
 def load_stock_data(symbol, config):
     path = config.stock_price_file_path(symbol)
-    return pd.read_csv(path, parse_dates=[0])
+    return pd.read_csv(path, index_col=0, parse_dates=True)
