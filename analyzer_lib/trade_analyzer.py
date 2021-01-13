@@ -24,7 +24,10 @@ def is_buy_timing(i, df):
     if contains_nan(prices_prev + sma25_prev + sma75_prev + sma120_prev + macd2_prev):
         return False
 
-    # Check golden cross
+    # If multiple crosses were occurred in these days, it could be noise
+    if not technical_analyze_tool.has_single_cross(macd2_prev):
+        return False
+
     if not technical_analyze_tool.is_golden_cross(macd2[i-1], macd2[i]):
         return False
 

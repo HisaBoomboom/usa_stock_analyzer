@@ -64,3 +64,14 @@ def is_dead_cross(v1, v2):
     if None in [v1, v2]:
         return False
     return v1>0 and v2<0
+
+
+def has_single_cross(data):
+    count = 0
+    for i in range(1, len(data)):
+        if is_golden_cross(data[i-1], data[i]) or is_dead_cross(data[i-1], data[i]):
+            count = 1
+    if count == 1:
+        return True
+    else:
+        return False

@@ -3,21 +3,30 @@ import pandas as pd
 from analyzer_lib import *
 from common_lib import *
 
+import numpy as np
 
 def main():
     config = config_loader.Config()
     symbols = data_loader.load_ticker_symbols_as_list(config)
 
-    result = []
+    total_benefit_hist = []
     for symbol in symbols:
-        benefit = simulate(symbol, config)
-        result.append("{} {}\n".format(symbol, benefit))
+        trading_hist = simulate(symbol, config)
+        print("===== {} =====".format(symbol))
+        print(trading_hist)
+        if len(trading_hist) != 0:
+            total_benefit_hist += trading_hist
 
     print("#################")
     print("SUMMARY")
     with open("output/summary.txt", 'w+') as f:
-        for i in result:
-            f.write(i)
+        for i in total_benefit_hist:
+            f.write(str(i) + '\n')
+
+        all_prod = np.prod(total_benefit_hist)
+        f.write("RESULT\n")
+        f.write(str(all_prod))
+        print("Total Benefit Ratio {}".format(all_prod))
 
 
 def simulate(symbol, config):
@@ -26,7 +35,7 @@ def simulate(symbol, config):
     """
     all_data = data_loader.load_stock_data(symbol, config)
     prices_df = all_data['Close']
-    prices_df = prices_df['2019':]
+    # prices_df = prices_df['2019':]
 
     macd = technical_analyze_tool.calc_macd(prices_df)
     sig = technical_analyze_tool.calc_macd_signal(prices_df)
@@ -41,39 +50,34 @@ def simulate(symbol, config):
     prices = df['Price'].values
 
     trading_hist = []       # Each element should be [(i, buy-price), (i, sell-price)]
-    buy = None
+    benefit_hist = []
+
+    buy_flag = True
+    buy_ind = None
     for i in range(len(prices)):
         if prices[i] == None:
             continue
 
         # Buy timing
-        if buy == None and trade_analyzer.is_buy_timing(i, df):
-            buy = (i, prices[i])
+        if buy_flag and trade_analyzer.is_buy_timing(i, df):
+            buy_ind = i
+            buy_flag = False
             continue
 
         # Sell timing
-        if buy != None and trade_analyzer.is_sell_timing(i, df):
-            trading_hist.append([buy, (i, prices[i])])
-            buy = None
+        if buy_flag == False and trade_analyzer.is_sell_timing(i, df):
+            benefit_ratio = prices[buy_ind] / prices[i]
+            benefit_hist.append(benefit_ratio)
+            trading_hist.append([(buy_ind, prices[buy_ind]), (i, prices[i])])
+            buy_flag = True
 
-    total_benefit_ratio = 1
-    for trade in trading_hist:
-        buy_price = trade[0][1]
-        sell_price = trade[1][1]
+    benefit_hist = [i for i in benefit_hist if not np.isnan(i)]
+    total_benefit_ratio = np.prod(benefit_hist)
 
-        benefit_ratio = (sell_price / buy_price)
-        total_benefit_ratio *= benefit_ratio
-
-    print("###### RESULT #######")
-    print("SYMBOL = {}".format(symbol))
-    print("TOTAL BENEFIT = {}".format(total_benefit_ratio))
-    print("TRADE COUNT = {}".format(len(trading_hist)))
-
-
-    if total_benefit_ratio < 1:
+    if len(benefit_hist) != 0:
         graph.save_trade_hist(df, trading_hist, symbol)
 
-    return total_benefit_ratio
+    return benefit_hist
 
 
 if __name__ == "__main__":
