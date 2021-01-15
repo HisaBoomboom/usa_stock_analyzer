@@ -7,30 +7,28 @@ import numpy as np
 from tqdm import tqdm
 
 
+RESULT_FILE_NAME = 'output/simulate_benefit.txt'
+RESULT_HISTOGRAM_NAME = 'output/simulate_benefit.png'
+
+WIN_PLOT_THRESHOLD = 1.2    # Plot as graph if result of benefit ratio is over than this threshold
+LOSE_PLOT_THRESHOLD = 0.8
+
+
 def main():
     config = config_loader.Config()
     symbols = data_loader.load_ticker_symbols_as_list(config)
 
-    sell_recommend = []
-    buy_recommend = []
+    total_benefit_hist = []
     for symbol in tqdm(symbols):
-        flag = recommend(symbol, 3, config)
-        if flag == 1:
-            buy_recommend.append(symbol)
-        elif flag == 2:
-            sell_recommend.append(symbol)
+        benefit_hist = simulate(symbol, config)
+        if len(benefit_hist) != 0:
+            total_benefit_hist += benefit_hist
 
-    with open('output/summary-buy.txt', 'w+') as f:
-        print("==== BUY TIMING ====")
-        for symbol in buy_recommend:
-            print(symbol)
-            f.write(symbol + '\n')
+    with open(RESULT_FILE_NAME, 'w+') as f:
+        for benefit in total_benefit_hist:
+            f.write(str(benefit) + '\n')
 
-    with open('output/summary-sell.txt', 'w+') as f:
-        print("==== SELL TIMING ====")
-        for symbol in sell_recommend:
-            print(symbol)
-            f.write(symbol + '\n')
+    graph.plot_benefit_summary_histogram(total_benefit_hist, RESULT_HISTOGRAM_NAME)
 
 
 def simulate(symbol, config):
@@ -54,6 +52,9 @@ def simulate(symbol, config):
     prices = df['Price'].values
 
     benefit_hist = []
+    buy_hist = []
+    sell_hist = []
+
     buy_flag = True
     buy_ind = None
 
@@ -64,57 +65,25 @@ def simulate(symbol, config):
         # Buy timing
         if buy_flag and trade_analyzer.is_buy_timing(i, df):
             buy_ind = i
+            buy_hist.append((i, prices[i]))
             buy_flag = False
             continue
 
         # Sell timing
         if buy_flag == False and trade_analyzer.is_sell_timing(i, df):
             benefit_ratio = prices[buy_ind] / prices[i]
+            sell_hist.append((i,prices[i]))
             benefit_hist.append(benefit_ratio)
             buy_flag = True
 
     benefit_hist = [i for i in benefit_hist if not np.isnan(i)]
+
+    for benefit in benefit_hist:
+        if benefit > WIN_PLOT_THRESHOLD or benefit < LOSE_PLOT_THRESHOLD:
+            graph.plot_trade_hist(df, buy_hist, sell_hist, symbol)
+            return benefit_hist
+
     return benefit_hist
-
-
-def recommend(symbol, days, config):
-    all_data = data_loader.load_stock_data(symbol, config)
-    prices_df = all_data['Close']
-    prices_df = prices_df['2020':]
-
-    macd = technical_analyze_tool.calc_macd(prices_df)
-    sig = technical_analyze_tool.calc_macd_signal(prices_df)
-
-    df = pd.DataFrame({
-        'Price': prices_df,
-        'SMA25': technical_analyze_tool.calc_sma(prices_df, 25),
-        'SMA75': technical_analyze_tool.calc_sma(prices_df, 75),
-        'SMA120': technical_analyze_tool.calc_sma(prices_df, 120),
-        'MACD2': macd - sig
-    })
-    prices = df['Price'].values
-
-    buy_hist = []
-    sell_hist = []
-    for i in range(days):
-        if trade_analyzer.is_buy_timing(len(prices)-i-1, df):
-            ix = len(prices)-i-1
-            buy_hist.append((ix, prices[ix]))
-
-        if trade_analyzer.is_sell_timing(len(prices)-i-1, df):
-            ix = len(prices) - i - 1
-            sell_hist.append((ix, prices[ix]))
-
-    if len(buy_hist) != 0 or len(sell_hist) != 0:
-        graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
-
-        if trade_analyzer.is_buy_timing(len(prices)-1, df):
-            return 1
-
-        if trade_analyzer.is_sell_timing(len(prices)-1, df):
-            return 2
-        
-    return 0
 
 
 if __name__ == "__main__":

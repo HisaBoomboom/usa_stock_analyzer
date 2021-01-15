@@ -54,3 +54,10 @@ def plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, flag):
 
     plt.clf()
     plt.close()
+
+
+def plot_benefit_summary_histogram(data, file_name):
+    plt.clf()
+    plt.hist(data)
+    plt.savefig(file_name)
+    plt.close()
