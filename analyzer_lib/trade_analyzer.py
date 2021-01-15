@@ -68,19 +68,26 @@ def is_sell_timing(i, df):
     sma120 = df['SMA120'].values
     macd2 = df['MACD2'].values
 
-    if prices[i] < sma25[i]:
+    prices_prev = prices[i - 5:i]
+    sma25_prev = sma25[i - 5:i]
+    sma75_prev = sma75[i - 7:i]
+    sma120_prev = sma120[i - 15:i]
+    macd2_prev = macd2[i - 5:i]
+
+    if contains_nan(prices_prev) or contains_nan(sma25_prev) or contains_nan(sma75_prev) or contains_nan(sma120_prev) or contains_nan(macd2_prev):
+        return False
+
+    if prices[i] < sma75[i] or prices[i] < sma120[i]:
         return True
 
-    if prices[i] < sma75[i]:
+    if technical_analyze_tool.has_single_cross(macd2_prev)\
+            and technical_analyze_tool.is_dead_cross(macd2[i-1], macd2[i]):
         return True
 
-    if technical_analyze_tool.is_dead_cross(macd2[i-1], macd2[i]):
+    if technical_analyze_tool.calc_regression_line_slope(sma75_prev) < 0:
         return True
 
-    if technical_analyze_tool.calc_regression_line_slope(sma75[i-5:i]) < 0:
-        return True
-
-    if technical_analyze_tool.calc_regression_line_slope(sma120[i-5:i]) < 0:
+    if technical_analyze_tool.calc_regression_line_slope(sma120_prev) < 0:
         return True
     return False
 

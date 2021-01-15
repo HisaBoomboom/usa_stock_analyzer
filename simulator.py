@@ -28,7 +28,7 @@ def main():
         for benefit in total_benefit_hist:
             f.write(str(benefit) + '\n')
 
-    graph.plot_benefit_summary_histogram(total_benefit_hist, RESULT_HISTOGRAM_NAME)
+    graph.save_histogram(total_benefit_hist, RESULT_HISTOGRAM_NAME)
 
 
 def simulate(symbol, config):
@@ -37,7 +37,6 @@ def simulate(symbol, config):
     """
     all_data = data_loader.load_stock_data(symbol, config)
     prices_df = all_data['Close']
-    prices_df = prices_df['2020':]
 
     macd = technical_analyze_tool.calc_macd(prices_df)
     sig = technical_analyze_tool.calc_macd_signal(prices_df)
@@ -80,7 +79,7 @@ def simulate(symbol, config):
 
     for benefit in benefit_hist:
         if benefit > WIN_PLOT_THRESHOLD or benefit < LOSE_PLOT_THRESHOLD:
-            graph.plot_trade_hist(df, buy_hist, sell_hist, symbol)
+            graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
             return benefit_hist
 
     return benefit_hist

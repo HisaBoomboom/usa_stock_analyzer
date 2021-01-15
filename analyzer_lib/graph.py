@@ -1,15 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_trade_hist(df, buy_hist, sell_hist, file_name):
-    plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, 'plot')
-
-
 def save_trade_hist(df, buy_hist, sell_hist, file_name):
-    plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, 'save')
-
-
-def plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, flag):
     plt.clf()
 
     prices = df['Price'].values
@@ -47,17 +39,13 @@ def plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, flag):
         ax1.axvline(ix, ymin=0, ymax=1, color='r', linestyle='dotted')
         ax2.axvline(ix, ymin=0, ymax=1, color='r', linestyle='dotted')
 
-    if flag == 'plot':
-        plt.show()
-    elif flag == 'save':
-        plt.savefig("output/{}.png".format(file_name))
-
+    plt.savefig("output/{}.png".format(file_name))
     plt.clf()
     plt.close()
 
 
-def plot_benefit_summary_histogram(data, file_name):
+def save_histogram(data, file_name):
     plt.clf()
-    plt.hist(data)
+    plt.hist(data, bins=100)
     plt.savefig(file_name)
     plt.close()
