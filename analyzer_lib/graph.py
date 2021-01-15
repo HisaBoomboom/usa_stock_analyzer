@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 
 
-def plot_trade_hist(df, trading_hist, symbol):
-    plot_or_save_trade_hist(df, trading_hist, symbol, 'plot')
+def plot_trade_hist(df, buy_hist, sell_hist, file_name):
+    plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, 'plot')
 
 
-def save_trade_hist(df, trading_hist, symbol):
-    plot_or_save_trade_hist(df, trading_hist, symbol, 'save')
+def save_trade_hist(df, buy_hist, sell_hist, file_name):
+    plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, 'save')
 
 
-def plot_or_save_trade_hist(df, trading_hist, symbol, flag):
+def plot_or_save_trade_hist(df, buy_hist, sell_hist, file_name, flag):
     plt.clf()
 
     prices = df['Price'].values
@@ -33,17 +33,24 @@ def plot_or_save_trade_hist(df, trading_hist, symbol, flag):
     ax1.set_xlim([120, len(prices)])
     ax2.set_xlim([120, len(prices)])
 
-    for trade in trading_hist:
-        buy = trade[0]
-        sell = trade[1]
-        ax1.plot(buy[0], buy[1], marker="^", markersize=10, color='b')
-        ax1.plot(sell[0], sell[1], marker="v", markersize=10, color='r')
-        ax1.axvline(buy[0], ymin=0, ymax=1, color='b', linestyle='dotted')
-        ax1.axvline(sell[0], ymin=0, ymax=1, color='r', linestyle='dotted')
-        ax2.axvline(buy[0], ymin=0, ymax=1, color='b', linestyle='dotted')
-        ax2.axvline(sell[0], ymin=0, ymax=1, color='r', linestyle='dotted')
+    for trade in buy_hist:
+        ix = trade[0]
+        price = trade[1]
+        ax1.plot(ix, price, marker="^", markersize=10, color='b')
+        ax1.axvline(ix, ymin=0, ymax=1, color='b', linestyle='dotted')
+        ax2.axvline(ix, ymin=0, ymax=1, color='b', linestyle='dotted')
+
+    for trade in sell_hist:
+        ix = trade[0]
+        price = trade[1]
+        ax1.plot(ix, price, marker="v", markersize=10, color='r')
+        ax1.axvline(ix, ymin=0, ymax=1, color='r', linestyle='dotted')
+        ax2.axvline(ix, ymin=0, ymax=1, color='r', linestyle='dotted')
 
     if flag == 'plot':
         plt.show()
     elif flag == 'save':
-        plt.savefig("output/{}.png".format(symbol))
+        plt.savefig("output/{}.png".format(file_name))
+
+    plt.clf()
+    plt.close()

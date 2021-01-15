@@ -4,29 +4,33 @@ from analyzer_lib import *
 from common_lib import *
 
 import numpy as np
+from tqdm import tqdm
+
 
 def main():
     config = config_loader.Config()
     symbols = data_loader.load_ticker_symbols_as_list(config)
 
-    total_benefit_hist = []
-    for symbol in symbols:
-        trading_hist = simulate(symbol, config)
-        print("===== {} =====".format(symbol))
-        print(trading_hist)
-        if len(trading_hist) != 0:
-            total_benefit_hist += trading_hist
+    sell_recommend = []
+    buy_recommend = []
+    for symbol in tqdm(symbols):
+        flag = recommend(symbol, 3, config)
+        if flag == 1:
+            buy_recommend.append(symbol)
+        elif flag == 2:
+            sell_recommend.append(symbol)
 
-    print("#################")
-    print("SUMMARY")
-    with open("output/summary.txt", 'w+') as f:
-        for i in total_benefit_hist:
-            f.write(str(i) + '\n')
+    with open('output/summary-buy.txt', 'w+') as f:
+        print("==== BUY TIMING ====")
+        for symbol in buy_recommend:
+            print(symbol)
+            f.write(symbol + '\n')
 
-        all_prod = np.prod(total_benefit_hist)
-        f.write("RESULT\n")
-        f.write(str(all_prod))
-        print("Total Benefit Ratio {}".format(all_prod))
+    with open('output/summary-sell.txt', 'w+') as f:
+        print("==== SELL TIMING ====")
+        for symbol in sell_recommend:
+            print(symbol)
+            f.write(symbol + '\n')
 
 
 def simulate(symbol, config):
@@ -35,7 +39,7 @@ def simulate(symbol, config):
     """
     all_data = data_loader.load_stock_data(symbol, config)
     prices_df = all_data['Close']
-    # prices_df = prices_df['2019':]
+    prices_df = prices_df['2020':]
 
     macd = technical_analyze_tool.calc_macd(prices_df)
     sig = technical_analyze_tool.calc_macd_signal(prices_df)
@@ -49,11 +53,10 @@ def simulate(symbol, config):
     })
     prices = df['Price'].values
 
-    trading_hist = []       # Each element should be [(i, buy-price), (i, sell-price)]
     benefit_hist = []
-
     buy_flag = True
     buy_ind = None
+
     for i in range(len(prices)):
         if prices[i] == None:
             continue
@@ -68,16 +71,50 @@ def simulate(symbol, config):
         if buy_flag == False and trade_analyzer.is_sell_timing(i, df):
             benefit_ratio = prices[buy_ind] / prices[i]
             benefit_hist.append(benefit_ratio)
-            trading_hist.append([(buy_ind, prices[buy_ind]), (i, prices[i])])
             buy_flag = True
 
     benefit_hist = [i for i in benefit_hist if not np.isnan(i)]
-    total_benefit_ratio = np.prod(benefit_hist)
-
-    if len(benefit_hist) != 0:
-        graph.save_trade_hist(df, trading_hist, symbol)
-
     return benefit_hist
+
+
+def recommend(symbol, days, config):
+    all_data = data_loader.load_stock_data(symbol, config)
+    prices_df = all_data['Close']
+    prices_df = prices_df['2020':]
+
+    macd = technical_analyze_tool.calc_macd(prices_df)
+    sig = technical_analyze_tool.calc_macd_signal(prices_df)
+
+    df = pd.DataFrame({
+        'Price': prices_df,
+        'SMA25': technical_analyze_tool.calc_sma(prices_df, 25),
+        'SMA75': technical_analyze_tool.calc_sma(prices_df, 75),
+        'SMA120': technical_analyze_tool.calc_sma(prices_df, 120),
+        'MACD2': macd - sig
+    })
+    prices = df['Price'].values
+
+    buy_hist = []
+    sell_hist = []
+    for i in range(days):
+        if trade_analyzer.is_buy_timing(len(prices)-i-1, df):
+            ix = len(prices)-i-1
+            buy_hist.append((ix, prices[ix]))
+
+        if trade_analyzer.is_sell_timing(len(prices)-i-1, df):
+            ix = len(prices) - i - 1
+            sell_hist.append((ix, prices[ix]))
+
+    if len(buy_hist) != 0 or len(sell_hist) != 0:
+        graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
+
+        if trade_analyzer.is_buy_timing(len(prices)-1, df):
+            return 1
+
+        if trade_analyzer.is_sell_timing(len(prices)-1, df):
+            return 2
+        
+    return 0
 
 
 if __name__ == "__main__":
