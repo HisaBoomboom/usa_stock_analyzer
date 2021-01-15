@@ -38,15 +38,12 @@ def simulate(symbol, config):
     all_data = data_loader.load_stock_data(symbol, config)
     prices_df = all_data['Close']
 
-    macd = technical_analyze_tool.calc_macd(prices_df)
-    sig = technical_analyze_tool.calc_macd_signal(prices_df)
-
     df = pd.DataFrame({
         'Price': prices_df,
         'SMA25': technical_analyze_tool.calc_sma(prices_df, 25),
         'SMA75': technical_analyze_tool.calc_sma(prices_df, 75),
         'SMA120': technical_analyze_tool.calc_sma(prices_df, 120),
-        'MACD2': macd - sig
+        'MACD2': technical_analyze_tool.calc_macd2(prices_df)
     })
     prices = df['Price'].values
 

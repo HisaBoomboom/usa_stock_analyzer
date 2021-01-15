@@ -1,5 +1,3 @@
-import pandas as pd
-
 def calc_sma(df, days):
     return df.rolling(window=days).mean()
 
@@ -10,9 +8,10 @@ def calc_macd(df):
     return ema12 - ema26
 
 
-def calc_macd_signal(df):
+def calc_macd2(df):
     macd = calc_macd(df)
-    return calc_sma(macd, 9)
+    macd_sig = calc_sma(macd, 9)
+    return macd - macd_sig
 
 
 def calc_ema(df, span):

@@ -21,10 +21,10 @@ def is_buy_timing(i, df):
     sma120_prev = sma120[i-15:i]
     macd2_prev = macd2[i-5:i]
 
-    if contains_nan(prices_prev) or contains_nan(sma25_prev) or contains_nan(sma75_prev) or contains_nan(sma120_prev) or contains_nan(macd2_prev):
+    if has_nan(prices_prev) or has_nan(sma25_prev) or has_nan(sma75_prev) or has_nan(sma120_prev) or has_nan(macd2_prev):
         return False
 
-    # If multiple crosses were occurred in these days, it could be noise
+    # Multiple cross can be noise.
     if not technical_analyze_tool.has_single_cross(macd2_prev):
         return False
 
@@ -39,7 +39,7 @@ def is_buy_timing(i, df):
         return False
 
     # Slope is plus
-    if None in sma25_prev or None in sma75_prev or None in sma120_prev:
+    if None in sma25_prev + sma75_prev + sma120_prev:
         return False
 
     if technical_analyze_tool.calc_regression_line_slope(sma25_prev) < 0:
@@ -74,7 +74,7 @@ def is_sell_timing(i, df):
     sma120_prev = sma120[i - 15:i]
     macd2_prev = macd2[i - 5:i]
 
-    if contains_nan(prices_prev) or contains_nan(sma25_prev) or contains_nan(sma75_prev) or contains_nan(sma120_prev) or contains_nan(macd2_prev):
+    if has_nan(prices_prev) or has_nan(sma25_prev) or has_nan(sma75_prev) or has_nan(sma120_prev) or has_nan(macd2_prev):
         return False
 
     if prices[i] < sma75[i] or prices[i] < sma120[i]:
@@ -92,7 +92,7 @@ def is_sell_timing(i, df):
     return False
 
 
-def contains_nan(data):
+def has_nan(data):
     for i in data:
         if np.isnan(i):
             return True
