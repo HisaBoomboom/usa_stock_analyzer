@@ -7,7 +7,7 @@ from tqdm import tqdm
 from common_lib import *
 
 
-START_DATE = datetime(2018, 1, 1)
+START_DATE = datetime(2018, 1, 1)   # Change here if you want to get old/new data.
 END_DATE = datetime.now()
 DEFAULT_INTERVAL = 60
 
