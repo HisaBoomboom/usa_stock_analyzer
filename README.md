@@ -74,12 +74,12 @@ python simulator.py
 
 A result is outputted to `output` directory. `simulate_benefit.txt` is the summary file of all trades based on your algorithm.
 
-For example, if your algorithm buys stock `300$` and buy `400$`.
+For example, if your algorithm buys stock `400$` and sell `500$`.
 ```shell
 buy: 400
 sell: 500
 benefit ratio: 1.25
 ```
-In this case, line `1.25` is added in `simulate_benefit.txt`. Also, you can check a histogram image of all the benefit ratios at `simulate_benefit.png`.
+In this case, line `1.25` is added in `simulate_benefit.txt`. A histogram of all the benefit ratios is saved as `simulate_benefit.png`.
 
 Also, in case where a benefit ratio is lower than 0.8 or bigger than 1.2, a graph that shows timings of trade is occurred is saved under `output` so that you can check how your algorithm works (blue marker shows buy timing, and red one shows sell timing).
