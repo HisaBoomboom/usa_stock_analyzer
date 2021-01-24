@@ -12,7 +12,7 @@ export RESOURCE_BASE_DIR=/path/to/local/resource/
 mkdir ${RESOURCE_BASE_DIR}/stock_price
 ```
 
-### 2. Preparation
+### 2. Prepare symbol list file
 Create `symbols.txt` under local resource directory which contains list of target ticker symbols. **This should be done manually.**
 
 The stock data in this file are going to be downloaded by application.
@@ -54,7 +54,7 @@ Date,High,Low,Open,Close,Adj Close,Volume
 
 ## Refresh local data
 If you already have stock prices data downloaded by `data_crawler.py` and you want to refresh data as current time.
-You can use `data_fetcher.py` to retrieve lack data.
+You can use `data_fetcher.py` to retrieve lack data. Note that RESOURCE_BASE_DIR must be specified in advance.
 ```shell
 python data_fetcher.py
 ```
