@@ -39,7 +39,7 @@ def is_buy_timing(i, df):
         return False
 
     # Slope is plus
-    if None in sma25_prev + sma75_prev + sma120_prev:
+    if None in sma25_prev or None in  sma75_prev or None in  sma120_prev:
         return False
 
     if technical_analyze_tool.calc_regression_line_slope(sma25_prev) < 0:
