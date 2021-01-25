@@ -47,5 +47,6 @@ def save_trade_hist(df, buy_hist, sell_hist, file_name):
 def save_histogram(data, file_name):
     plt.clf()
     plt.hist(data, bins=100)
+    plt.xlim([0, 3])
     plt.savefig(file_name)
     plt.close()

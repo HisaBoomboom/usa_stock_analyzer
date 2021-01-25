@@ -60,8 +60,6 @@ def recommend(symbol, days, config):
             sell_hist.append((ix, prices[ix]))
 
     if len(buy_hist) != 0 or len(sell_hist) != 0:
-        graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
-
         if trade_analyzer.is_buy_timing(len(prices) - 1, df):
             return 1
 

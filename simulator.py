@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 
 from analyzer_lib import *
 from common_lib import *
@@ -17,6 +18,7 @@ LOSE_PLOT_THRESHOLD = 0.8
 def main():
     config = config_loader.Config()
     symbols = data_loader.load_ticker_symbols_as_list(config)
+    symbols = random.sample(symbols, 500)
 
     total_benefit_hist = []
     for symbol in tqdm(symbols):
@@ -36,7 +38,7 @@ def simulate(symbol, config):
     Walk through stock price data, mark buy/sell timings, and output result if you buy/sell stocks at those timings.
     """
     all_data = data_loader.load_stock_data(symbol, config)
-    prices_df = all_data['Close']
+    prices_df = all_data['Close']['2019':]
 
     df = pd.DataFrame({
         'Price': prices_df,
@@ -67,17 +69,15 @@ def simulate(symbol, config):
 
         # Sell timing
         if buy_flag == False and trade_analyzer.is_sell_timing(i, df):
-            benefit_ratio = prices[buy_ind] / prices[i]
+            benefit_ratio = prices[i] / prices[buy_ind]
             sell_hist.append((i,prices[i]))
             benefit_hist.append(benefit_ratio)
             buy_flag = True
 
     benefit_hist = [i for i in benefit_hist if not np.isnan(i)]
 
-    for benefit in benefit_hist:
-        if benefit > WIN_PLOT_THRESHOLD or benefit < LOSE_PLOT_THRESHOLD:
-            graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
-            return benefit_hist
+    if len(sell_hist) > 0:
+        graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
 
     return benefit_hist
 
