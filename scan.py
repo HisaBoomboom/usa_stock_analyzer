@@ -39,15 +39,12 @@ def recommend(symbol, days, config):
     prices_df = all_data['Close']
     prices_df = prices_df['2020':]
 
-    macd = technical_analyze_tool.calc_macd(prices_df)
-    sig = technical_analyze_tool.calc_macd_signal(prices_df)
-
     df = pd.DataFrame({
         'Price': prices_df,
         'SMA25': technical_analyze_tool.calc_sma(prices_df, 25),
         'SMA75': technical_analyze_tool.calc_sma(prices_df, 75),
         'SMA120': technical_analyze_tool.calc_sma(prices_df, 120),
-        'MACD2': macd - sig
+        'MACD2': technical_analyze_tool.calc_macd2(prices_df)
     })
     prices = df['Price'].values
 
@@ -63,8 +60,6 @@ def recommend(symbol, days, config):
             sell_hist.append((ix, prices[ix]))
 
     if len(buy_hist) != 0 or len(sell_hist) != 0:
-        graph.save_trade_hist(df, buy_hist, sell_hist, symbol)
-
         if trade_analyzer.is_buy_timing(len(prices) - 1, df):
             return 1
 

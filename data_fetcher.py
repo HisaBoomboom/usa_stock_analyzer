@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from common_lib import *
 
-DEFAULT_INTERVAL = 60
+DEFAULT_INTERVAL = 15
 END_DATE = datetime.now()
 
 def main():
