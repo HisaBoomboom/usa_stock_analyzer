@@ -24,7 +24,12 @@ def is_buy_timing(i, df):
     if not technical_analyze_tool.has_single_cross(macd2_prev):
         return False
 
-    if not technical_analyze_tool.is_golden_cross(macd2[i-1], macd2[i]):
+    # Golden cross is occurred at yesterday
+    if not technical_analyze_tool.is_golden_cross(macd2[i-2], macd2[i-1]):
+        return False
+
+    # Today not getting bad
+    if not (prices[i-1] <= prices[i]):
         return False
     
     if technical_analyze_tool.calc_regression_line_slope(sma25_prev) < 0:

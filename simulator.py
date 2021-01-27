@@ -18,7 +18,7 @@ LOSE_PLOT_THRESHOLD = 0.8
 def main():
     config = config_loader.Config()
     symbols = data_loader.load_ticker_symbols_as_list(config)
-    symbols = random.sample(symbols, 500)
+    # symbols = random.sample(symbols, 500)
 
     total_benefit_hist = []
     for symbol in tqdm(symbols):
