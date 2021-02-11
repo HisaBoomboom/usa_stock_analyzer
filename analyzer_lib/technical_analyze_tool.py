@@ -1,3 +1,4 @@
+import talib as ta
 def calc_sma(df, days):
     return df.rolling(window=days).mean()
 
@@ -36,6 +37,12 @@ def calc_regression_line_slope(data):
     covariance = sum([(xi - x_ave) * (yi - y_ave) for xi, yi in zip(x_list, y_list)]) / n
 
     return covariance / x_dispersion
+
+def calc_rsi(df, span):
+    if df.isnull().all():
+        return 50
+    else:
+        return ta.RSI(df, timeperiod = span)
 
 
 def is_all_prices_are_higher_than_trend(prices, trend):

@@ -12,6 +12,7 @@ def is_buy_timing(i, df):
     prices = df['Price'].values
     sma25 = df['SMA25'].values
     macd2 = df['MACD2'].values
+    rsi14 = df['RSI14'].values
 
     prices_prev = prices[i-5:i]
     sma25_prev = sma25[i-5:i]
@@ -35,6 +36,9 @@ def is_buy_timing(i, df):
     if technical_analyze_tool.calc_regression_line_slope(sma25_prev) < 0:
         return False
 
+    if rsi14[i] > 30:
+        return False
+
     return True
 
 
@@ -51,6 +55,7 @@ def is_sell_timing(i, df):
     sma75 = df['SMA75'].values
     sma120 = df['SMA120'].values
     macd2 = df['MACD2'].values
+    rsi14 = df['RSI14'].values
 
     prices_prev = prices[i - 5:i]
     sma25_prev = sma25[i - 5:i]
@@ -62,10 +67,12 @@ def is_sell_timing(i, df):
         return False
 
     if prices[i] < sma75[i] or prices[i] < sma120[i]:
-        return True
+        if rsi14[i] > 70:
+            return True
 
     if technical_analyze_tool.has_single_cross(macd2_prev) and technical_analyze_tool.is_dead_cross(macd2[i-1], macd2[i]):
-        return True
+        if rsi14[i] > 70:
+            return True
 
     return False
 

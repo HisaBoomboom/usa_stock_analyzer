@@ -44,7 +44,8 @@ def recommend(symbol, days, config):
         'SMA25': technical_analyze_tool.calc_sma(prices_df, 25),
         'SMA75': technical_analyze_tool.calc_sma(prices_df, 75),
         'SMA120': technical_analyze_tool.calc_sma(prices_df, 120),
-        'MACD2': technical_analyze_tool.calc_macd2(prices_df)
+        'MACD2': technical_analyze_tool.calc_macd2(prices_df),
+        'RSI14': technical_analyze_tool.calc_rsi(prices_df, 14)
     })
     prices = df['Price'].values
 
