@@ -1,7 +1,12 @@
 # usa_stock_analyzer
-![](https://img.shields.io/badge/Python-3.6.2-green.svg?style=flat-square&logo=python)
+![](https://img.shields.io/badge/Python-3.7.9-green.svg?style=flat-square&logo=python)
 
 Tool for checking buy/sell timing based on stock price data.
+
+To install required libraries.
+```shell
+pip install -r requirements.txt
+```
 
 # Preparation
 ## Download stock price data
