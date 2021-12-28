@@ -1,5 +1,7 @@
 import pandas as pd
 import pandas_datareader.data as web
+from pandas_datareader import data as pdr
+import yfinance as yf
 
 DATA_SOURCE_KEY = "yahoo"
 STOCK_DATA_KEY_LIST = ['High', 'Low', 'Open', 'Close', 'Adj Close', 'Volume']
@@ -19,8 +21,11 @@ def bulk_download_stock_price_data(symbols, start, end, config):
     Get all stock data of given symbol list, and save data corresponding to each key as csv.
     symbols: list
     """
+
+    symbollist = symbols.tolist()
     print("start downloading data...")
-    all_df = web.DataReader(symbols, DATA_SOURCE_KEY, start=start, end=end)
+    yf.pdr_override()
+    all_df = pdr.get_data_yahoo(symbollist, start=start, end=end)
     print("success to download")
 
     for symbol in symbols:
@@ -38,8 +43,10 @@ def bulk_download_and_fetch_price_data(symbols, start, end, config):
     """
     Get all data of given symbol list, merge downloaded data with existing data and overwrite.
     """
+    symbollist = symbols.tolist()
     print("start downloading data...")
-    all_df = web.DataReader(symbols, DATA_SOURCE_KEY, start=start, end=end)
+    yf.pdr_override()
+    all_df = pdr.get_data_yahoo(symbollist, start=start, end=end)
     print("success to download")
 
     for symbol in symbols:
